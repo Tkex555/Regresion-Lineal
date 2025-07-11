@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Viviendas</title>
+</head>
+<body>
+    <h1>Listado de Viviendas</h1>
+    <table border="1">
+        <tr>
+            {% for col in viviendas[0].keys() %}
+            <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+        {% for v in viviendas %}
+        <tr>
+            {% for value in v.values() %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

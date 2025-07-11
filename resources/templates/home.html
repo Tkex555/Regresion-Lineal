@@ -1,24 +1,80 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Viviendas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Listado de Viviendas</h1>
-    <table border="1">
-        <tr>
-            {% for col in viviendas[0].keys() %}
-            <th>{{ col }}</th>
-            {% endfor %}
-        </tr>
-        {% for v in viviendas %}
-        <tr>
-            {% for value in v.values() %}
-            <td>{{ value }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Gestión de Viviendas</h1>
+            <p>Sistema de administración y control de propiedades</p>
+        </div>
+
+        <div class="table-container">
+            {% if viviendas %}
+            <div class="stats">
+                <div class="stats-item">
+                    <h3>{{ viviendas|length }}</h3>
+                    <p>Total de Viviendas</p>
+                </div>
+                <div class="search-container">
+                    <input type="text" class="search-box" placeholder="🔍 Buscar viviendas..." id="searchInput">
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Cargando datos...</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="viviendasTable">
+                    <thead>
+                        <tr>
+                            {% for col in viviendas[0].keys() %}
+                            <th>{{ col|title|replace('_', ' ') }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in viviendas %}
+                        <tr>
+                            {% for key, value in v.items() %}
+                            <td>
+                                {% if key.lower() in ['estado', 'status', 'state'] %}
+                                    {% if value.lower() in ['disponible', 'available'] %}
+                                        <span class="status-badge status-available">{{ value }}</span>
+                                    {% elif value.lower() in ['ocupado', 'occupied'] %}
+                                        <span class="status-badge status-occupied">{{ value }}</span>
+                                    {% else %}
+                                        <span class="status-badge status-maintenance">{{ value }}</span>
+                                    {% endif %}
+                                {% elif key.lower() in ['precio', 'price', 'costo', 'cost'] %}
+                                    <span class="price">${{ "{:,.2f}".format(value) if value is number else value }}</span>
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-data">
+                <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">🏠</div>
+                <h3>No hay viviendas registradas</h3>
+                <p>Agrega algunas viviendas para comenzar a gestionar tu inventario</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/viviendas.js') }}"></script>
 </body>
 </html>

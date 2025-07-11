@@ -2,10 +2,19 @@ import pandas as pd
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 from ..models.model import RegresionLinealModelo
+from ..database.db_conexion import MongoConexion  # Asegúrate de tener esta clase
 
 class ViviendaController:
-    def __init__(self, ruta_excel):
-        self.df = pd.read_excel(ruta_excel)
+    def __init__(self, nombre_coleccion="vivienda"):
+        # Conexión a MongoDB y carga de datos
+        conexion = MongoConexion()
+        conexion.conectar()
+        coleccion = conexion.db[nombre_coleccion]
+        datos = list(coleccion.find())
+        if datos and "_id" in datos[0]:
+            for d in datos:
+                d.pop("_id", None)  # Elimina el campo _id para evitar problemas con pandas
+        self.df = pd.DataFrame(datos)
         self.modelo = RegresionLinealModelo(self.df)
 
     def mostrar_tabla(self):

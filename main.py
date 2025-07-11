@@ -1,7 +1,7 @@
 from flask import Flask
 from src.views.home_view import home_bp
 
-app = Flask(__name__, template_folder='resources/templates')
+app = Flask(__name__, template_folder='resources/templates', static_folder='resources/static')
 
 # Registrar blueprint
 app.register_blueprint(home_bp)

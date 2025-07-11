@@ -21,3 +21,28 @@ class ViviendaController:
             print(self.df['tipo'].value_counts())
         else:
             print("No hay columna 'tipo' en el dataset.")
+
+    def diagrama_dispersion(self):
+        plt.scatter(self.df['area'], self.df['precio'])
+        plt.xlabel('Área (m2)')
+        plt.ylabel('Precio')
+        plt.title('Área vs Precio')
+        plt.show()
+
+    def entrenar_y_graficar_regresion(self):
+        intercepto, pendiente = self.modelo.entrenar()
+        X = self.df[['area']]
+        y = self.df['precio']
+        y_pred = self.modelo.modelo.predict(X)
+        plt.scatter(self.df['area'], self.df['precio'], label='Datos reales')
+        plt.plot(self.df['area'], y_pred, color='red', label='Regresión lineal')
+        plt.xlabel('Área (m2)')
+        plt.ylabel('Precio')
+        plt.title('Regresión lineal: área vs precio')
+        plt.legend()
+        plt.show()
+        print(f"Intercepto: {intercepto}")
+        print(f"Pendiente: {pendiente}")
+        mse, r2 = self.modelo.obtener_metricas()
+        print(f"MSE: {mse}")
+        print(f"R²: {r2}")

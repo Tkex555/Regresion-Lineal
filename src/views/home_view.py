@@ -1,5 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, Response
 from src.controllers.controller import ViviendaController
+import io
+import matplotlib.pyplot as plt
+import base64
 
 # 🔸 Primero defines el Blueprint
 home_bp = Blueprint('home', __name__)
@@ -22,3 +25,28 @@ def index():
         resumen += f"- {tipo}: {cantidad}\n"
 
     return render_template('home.html', viviendas=viviendas, total=total, promedio=promedio, tipos=tipos, resumen=resumen)
+
+@home_bp.route('/diagrama')
+def diagrama():
+    controller = ViviendaController()
+    fig, ax = plt.subplots()
+    # Puntos
+    ax.scatter(controller.df['area'], controller.df['precio'], label='Datos reales')
+    # Línea de regresión
+    controller.modelo.entrenar()
+    X = controller.df[['area']]
+    y_pred = controller.modelo.modelo.predict(X)
+    ax.plot(controller.df['area'], y_pred, color='red', label='Regresión lineal')
+    # Cuadrícula
+    ax.grid(True, linestyle='--', alpha=0.6)
+    ax.set_xlabel('Área (m2)')
+    ax.set_ylabel('Precio')
+    ax.set_title('Área vs Precio')
+    ax.legend()
+    import io, base64
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close(fig)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return render_template('diagrama.html', image_base64=image_base64)

@@ -2,10 +2,94 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Diagrama de Dispersión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Dispersión - Análisis de Datos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/diagrama.css') }}">
 </head>
 <body>
-    <h1>Diagrama de dispersión: Área vs Precio</h1>
-    <img src="data:image/png;base64,{{ image_base64 }}" alt="Diagrama de dispersión">
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <span class="header-icon">📊</span>
+                    Diagrama de Dispersión
+                </h1>
+                <p>Análisis de correlación: Área vs Precio de Viviendas</p>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ viviendas|length if viviendas else 'N/A' }}</span>
+                        <span class="stat-label">Puntos de Datos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">R²</span>
+                        <span class="stat-label">Correlación</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">↗️</span>
+                        <span class="stat-label">Tendencia</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generando diagrama...</p>
+        </div>
+
+        <div class="content">
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <img 
+                        src="data:image/png;base64,{{ image_base64 }}" 
+                        alt="Diagrama de dispersión: Área vs Precio"
+                        class="chart-image"
+                        id="chartImage"
+                    >
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="downloadBtn">
+                        💾 Descargar Imagen
+                    </button>
+                    <a href="{{ url_for('home.index') }}" class="btn btn-secondary">
+                        🏠 Volver al Inicio
+                    </a>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3 class="info-title">
+                    📈 Información del Análisis
+                </h3>
+                <div class="info-content">
+                    <p>Este diagrama de dispersión muestra la relación entre el área y el precio de las viviendas en nuestro conjunto de datos.</p>
+                    
+                    <ul class="info-list">
+                        <li><strong>Eje X:</strong> Área de la vivienda (m²)</li>
+                        <li><strong>Eje Y:</strong> Precio de la vivienda ($)</li>
+                        <li><strong>Cada punto:</strong> Representa una vivienda individual</li>
+                        <li><strong>Tendencia:</strong> Línea que muestra la correlación general</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;">
+                        <strong>Interpretación:</strong> Una tendencia ascendente indica que a mayor área, 
+                        generalmente mayor precio. La dispersión de los puntos muestra la variabilidad 
+                        en los precios para áreas similares.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para zoom -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="/placeholder.svg" alt="Diagrama ampliado">
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/diagrama.js') }}"></script>
 </body>
 </html>

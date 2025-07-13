@@ -30,10 +30,20 @@ def index():
 def diagrama():
     controller = ViviendaController()
     fig, ax = plt.subplots()
-    ax.scatter(controller.df['area'], controller.df['precio'])
+    # Puntos
+    ax.scatter(controller.df['area'], controller.df['precio'], label='Datos reales')
+    # Línea de regresión
+    controller.modelo.entrenar()
+    X = controller.df[['area']]
+    y_pred = controller.modelo.modelo.predict(X)
+    ax.plot(controller.df['area'], y_pred, color='red', label='Regresión lineal')
+    # Cuadrícula
+    ax.grid(True, linestyle='--', alpha=0.6)
     ax.set_xlabel('Área (m2)')
     ax.set_ylabel('Precio')
     ax.set_title('Área vs Precio')
+    ax.legend()
+    import io, base64
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     plt.close(fig)

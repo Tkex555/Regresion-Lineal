@@ -25,7 +25,7 @@ class ViviendaController:
 
     def _clasificar_tipo(self, descripcion):
         if not isinstance(descripcion, str):
-            return "Desconocido"
+            return "Otro"
         desc = descripcion.lower()
         if "casa" in desc:
             return "Casa"

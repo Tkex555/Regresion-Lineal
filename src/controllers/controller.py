@@ -2,19 +2,28 @@ import pandas as pd
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 from ..models.model import RegresionLinealModelo
-from ..database.db_conexion import MongoConexion  # Asegúrate de tener esta clase
+from ..database.db_conexion import MongoConexion
 
 class ViviendaController:
     def __init__(self, nombre_coleccion="vivienda"):
-        # Conexión a MongoDB y carga de datos
         conexion = MongoConexion()
         conexion.conectar()
-        coleccion = conexion.db[nombre_coleccion]
-        datos = list(coleccion.find())
-        if datos and "_id" in datos[0]:
-            for d in datos:
-                d.pop("_id", None)  # Elimina el campo _id para evitar problemas con pandas
-        self.df = pd.DataFrame(datos)
+        db = conexion.db
+
+        # Cargar viviendas y tipos de vivienda
+        viviendas = list(db[nombre_coleccion].find())
+        tipos = list(db["tipo_vivienda"].find())
+
+        # Crear diccionario id -> nombre del tipo de vivienda
+        mapa_tipos = {str(t["_id"]): t["nombre"] for t in tipos}
+
+        # Enlazar el nombre del tipo de vivienda a cada documento
+        for v in viviendas:
+            v.pop('_id', None)
+            id_tipo = str(v.get("id_tipo_vivienda"))
+            v["tipo"] = mapa_tipos.get(id_tipo, "Desconocido")
+
+        self.df = pd.DataFrame(viviendas)
         self.modelo = RegresionLinealModelo(self.df)
 
     def mostrar_tabla(self):

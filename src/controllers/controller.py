@@ -6,25 +6,33 @@ from ..database.db_conexion import MongoConexion
 
 class ViviendaController:
     def __init__(self, nombre_coleccion="vivienda"):
+        # Conexión a MongoDB y carga de datos
         conexion = MongoConexion()
         conexion.conectar()
-        db = conexion.db
+        coleccion = conexion.db[nombre_coleccion]
+        datos = list(coleccion.find())
 
-        # Cargar viviendas y tipos de vivienda
-        viviendas = list(db[nombre_coleccion].find())
-        tipos = list(db["tipo_vivienda"].find())
+        if datos and "_id" in datos[0]:
+            for d in datos:
+                d.pop("_id", None)  # Elimina el campo _id para evitar problemas con pandas
 
-        # Crear diccionario id -> nombre del tipo de vivienda
-        mapa_tipos = {str(t["_id"]): t["nombre"] for t in tipos}
+        self.df = pd.DataFrame(datos)
 
-        # Enlazar el nombre del tipo de vivienda a cada documento
-        for v in viviendas:
-            v.pop('_id', None)
-            id_tipo = str(v.get("id_tipo_vivienda"))
-            v["tipo"] = mapa_tipos.get(id_tipo, "Desconocido")
+        # Asignar tipo de vivienda desde la descripción
+        self.df['tipo'] = self.df['descripcion'].apply(self._clasificar_tipo)
 
-        self.df = pd.DataFrame(viviendas)
         self.modelo = RegresionLinealModelo(self.df)
+
+    def _clasificar_tipo(self, descripcion):
+        if not isinstance(descripcion, str):
+            return "Desconocido"
+        desc = descripcion.lower()
+        if "casa" in desc:
+            return "Casa"
+        elif "apartamento" in desc:
+            return "Apartamento"
+        else:
+            return "Otro"
 
     def mostrar_tabla(self):
         print(tabulate(self.df, headers='keys', tablefmt='psql'))

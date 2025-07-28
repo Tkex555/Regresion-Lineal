@@ -1,0 +1,73 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from ..models.modelDiagrama import RegresionLinealModeloDiagrama
+from ..database.db_conexion import MongoConexion
+
+class ViviendaDiagramaController:
+    def __init__(self, nombre_coleccion="vivienda"):
+        # Conexión a MongoDB y carga de datos
+        conexion = MongoConexion()
+        conexion.conectar()
+        coleccion = conexion.db[nombre_coleccion]
+        datos = list(coleccion.find())
+
+        if datos and "_id" in datos[0]:
+            for d in datos:
+                d.pop("_id", None)  # Elimina el campo _id para evitar problemas con pandas
+
+        self.df = pd.DataFrame(datos)
+
+        # Asignar tipo de vivienda desde la descripción
+        self.df['tipo'] = self.df['descripcion'].apply(self._clasificar_tipo)
+
+        self.modelo = RegresionLinealModeloDiagrama(self.df)
+
+    def _clasificar_tipo(self, descripcion):
+        if not isinstance(descripcion, str):
+            return "Otro"
+        desc = descripcion.lower()
+        if "casa" in desc:
+            return "Casa"
+        elif "apartamento" in desc:
+            return "Apartamento"
+        else:
+            return "Otro"
+
+    def mostrar_tabla(self):
+        print(self.df.to_string())
+
+    def resumen_estadistico(self):
+        total = len(self.df)
+        self.df['precio_m2'] = self.df['precio'] / self.df['area']
+        promedio = self.df['precio_m2'].mean()
+        print(f"Total de viviendas: {total}")
+        print(f"Promedio precio por m2: {promedio:.2f}")
+        if 'tipo' in self.df.columns:
+            print(self.df['tipo'].value_counts())
+        else:
+            print("No hay columna 'tipo' en el dataset.")
+
+    def diagrama_dispersion(self):
+        plt.scatter(self.df['area'], self.df['precio'])
+        plt.xlabel('Área (m2)')
+        plt.ylabel('Precio')
+        plt.title('Área vs Precio')
+        plt.show()
+
+    def entrenar_y_graficar_regresion(self):
+        intercepto, pendiente = self.modelo.entrenar()
+        X = self.df[['area']]
+        y = self.df['precio']
+        y_pred = self.modelo.modelo.predict(X)
+        plt.scatter(self.df['area'], self.df['precio'], label='Datos reales')
+        plt.plot(self.df['area'], y_pred, color='red', label='Regresión lineal')
+        plt.xlabel('Área (m2)')
+        plt.ylabel('Precio')
+        plt.title('Regresión lineal: área vs precio')
+        plt.legend()
+        plt.show()
+        print(f"Intercepto: {intercepto}")
+        print(f"Pendiente: {pendiente}")
+        mse, r2 = self.modelo.obtener_metricas()
+        print(f"MSE: {mse}")
+        print(f"R²: {r2}")

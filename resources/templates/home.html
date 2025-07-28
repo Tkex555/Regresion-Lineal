@@ -37,6 +37,10 @@
                     <h3>${{ "%.2f"|format(promedio) }}</h3>
                     <p>Promedio precio por m²</p>
                 </div>
+                <div class="stats-item">
+                    <p>Predicción de valor</p>
+                    <a href="/predecir" class="button">Predecir Valor de Vivienda</a>
+                </div>
                 {% for tipo, cantidad in tipos.items() %}
                 <div class="stats-item">
                     <h3>{{ cantidad }}</h3>

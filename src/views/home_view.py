@@ -1,16 +1,15 @@
-from flask import Blueprint, render_template, Response
-from src.controllers.controller import ViviendaController
+from flask import Blueprint, render_template, Response, request
+from src.controllers.controllerPredecir import ViviendaPredecirController
+from src.controllers.controllerDiagrama import ViviendaDiagramaController
 import io
 import matplotlib.pyplot as plt
 import base64
 
-# 🔸 Primero defines el Blueprint
 home_bp = Blueprint('home', __name__)
 
-# 🔸 Luego defines la ruta
 @home_bp.route('/')
 def index():
-    controller = ViviendaController()
+    controller = ViviendaPredecirController()
     viviendas = controller.df.to_dict(orient='records')
 
     total = len(controller.df)
@@ -28,25 +27,35 @@ def index():
 
 @home_bp.route('/diagrama')
 def diagrama():
-    controller = ViviendaController()
+    controller = ViviendaDiagramaController()
     fig, ax = plt.subplots()
-    # Puntos
     ax.scatter(controller.df['area'], controller.df['precio'], label='Datos reales')
-    # Línea de regresión
     controller.modelo.entrenar()
     X = controller.df[['area']]
     y_pred = controller.modelo.modelo.predict(X)
     ax.plot(controller.df['area'], y_pred, color='red', label='Regresión lineal')
-    # Cuadrícula
     ax.grid(True, linestyle='--', alpha=0.6)
     ax.set_xlabel('Área (m2)')
     ax.set_ylabel('Precio')
     ax.set_title('Área vs Precio')
     ax.legend()
-    import io, base64
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     plt.close(fig)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     return render_template('diagrama.html', image_base64=image_base64)
+
+@home_bp.route('/predecir', methods=['GET', 'POST'])
+def predecir():
+    prediccion = None
+    if request.method == 'POST':
+        area = float(request.form['area'])
+        habitaciones = int(request.form['habitaciones'])
+        antiguedad = int(request.form['antiguedad'])
+
+        controller = ViviendaPredecirController()
+        controller.modelo.entrenar()
+        prediccion = controller.modelo.predecir(area, habitaciones, antiguedad)
+
+    return render_template('predecir.html', prediccion=prediccion)

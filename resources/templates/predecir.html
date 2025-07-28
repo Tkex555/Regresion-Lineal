@@ -1,27 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Predecir valor de vivienda</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor de Precios - Viviendas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/predecir.css') }}">
 </head>
 <body>
-    <h2>Predecir valor de una vivienda</h2>
-    <form method="post">
-        <label>Área (m2):</label><br>
-        <input type="number" name="area" step="0.1" required><br><br>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <span class="header-icon">🏡</span>
+                    Predictor de Precios
+                </h1>
+                <p>Estima el valor de tu vivienda usando inteligencia artificial</p>
+            </div>
+        </div>
 
-        <label>Habitaciones:</label><br>
-        <input type="number" name="habitaciones" required><br><br>
+        <div class="content">
+            <!-- Tarjetas informativas -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon">📐</div>
+                    <div class="info-card-title">Área Precisa</div>
+                    <div class="info-card-text">Ingresa el área total en metros cuadrados</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">🛏️</div>
+                    <div class="info-card-title">Habitaciones</div>
+                    <div class="info-card-text">Número total de habitaciones</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">📅</div>
+                    <div class="info-card-title">Antigüedad</div>
+                    <div class="info-card-text">Años desde la construcción</div>
+                </div>
+            </div>
 
-        <label>Antigüedad (años):</label><br>
-        <input type="number" name="antiguedad" required><br><br>
+            <!-- Formulario -->
+            <div class="form-container">
+                <form method="post" id="predictionForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="area">
+                                📐 Área (m²)
+                            </label>
+                            <input 
+                                type="number" 
+                                id="area"
+                                name="area" 
+                                class="form-input"
+                                step="0.1" 
+                                min="1"
+                                max="1000"
+                                placeholder="Ej: 120.5"
+                                required
+                            >
+                            <div class="form-help">
+                                💡 Ingresa el área total construida
+                            </div>
+                        </div>
 
-        <button type="submit">Predecir</button>
-    </form>
+                        <div class="form-group">
+                            <label class="form-label" for="habitaciones">
+                                🛏️ Habitaciones
+                            </label>
+                            <input 
+                                type="number" 
+                                id="habitaciones"
+                                name="habitaciones" 
+                                class="form-input"
+                                min="1"
+                                max="20"
+                                placeholder="Ej: 3"
+                                required
+                            >
+                            <div class="form-help">
+                                💡 Número total de habitaciones
+                            </div>
+                        </div>
 
-    {% if prediccion is not none %}
-        <h3>Precio estimado: ${{ "{:,.2f}".format(prediccion) }}</h3>
-    {% endif %}
+                        <div class="form-group">
+                            <label class="form-label" for="antiguedad">
+                                📅 Antigüedad (años)
+                            </label>
+                            <input 
+                                type="number" 
+                                id="antiguedad"
+                                name="antiguedad" 
+                                class="form-input"
+                                min="0"
+                                max="100"
+                                placeholder="Ej: 5"
+                                required
+                            >
+                            <div class="form-help">
+                                💡 Años desde la construcción (0 = nueva)
+                            </div>
+                        </div>
+                    </div>
 
-    <br><a href="/"><button>Volver al inicio</button></a>
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Calculando predicción...</p>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                            🔮 Predecir Precio
+                        </button>
+                        <a href="{{ url_for('home.index') }}" class="btn btn-secondary">
+                        🏠 Volver al Inicio
+                    </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resultado -->
+            {% if prediccion is not none %}
+            <div class="result-container">
+                <div class="result-title">
+                    💰 Precio Estimado
+                </div>
+                <div class="result-price">
+                    ${{ "{:,.0f}".format(prediccion) }}
+                </div>
+                <div class="result-subtitle">
+                    Basado en las características ingresadas
+                </div>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon">🎯</div>
+                    <div class="info-card-title">Precisión</div>
+                    <div class="info-card-text">Estimación basada en datos históricos</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">📊</div>
+                    <div class="info-card-title">Análisis</div>
+                    <div class="info-card-text">Algoritmo de machine learning</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">⚡</div>
+                    <div class="info-card-title">Instantáneo</div>
+                    <div class="info-card-text">Resultado en tiempo real</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/predecir.js') }}"></script>
 </body>
 </html>

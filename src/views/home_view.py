@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, Response
+from flask import Blueprint, render_template, Response, request
 from src.controllers.controller import ViviendaController
 import io
 import matplotlib.pyplot as plt
@@ -43,7 +43,6 @@ def diagrama():
     ax.set_ylabel('Precio')
     ax.set_title('Área vs Precio')
     ax.legend()
-    import io, base64
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     plt.close(fig)
@@ -64,4 +63,3 @@ def predecir():
         prediccion = controller.modelo.predecir(area, habitaciones, antiguedad)
 
     return render_template('predecir.html', prediccion=prediccion)
-

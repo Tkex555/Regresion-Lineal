@@ -1,10 +1,9 @@
 import pandas as pd
-from tabulate import tabulate
 import matplotlib.pyplot as plt
-from ..models.model import RegresionLinealModelo
+from ..models.modelDiagrama import RegresionLinealModeloDiagrama
 from ..database.db_conexion import MongoConexion
 
-class ViviendaController:
+class ViviendaDiagramaController:
     def __init__(self, nombre_coleccion="vivienda"):
         # Conexión a MongoDB y carga de datos
         conexion = MongoConexion()
@@ -21,7 +20,7 @@ class ViviendaController:
         # Asignar tipo de vivienda desde la descripción
         self.df['tipo'] = self.df['descripcion'].apply(self._clasificar_tipo)
 
-        self.modelo = RegresionLinealModelo(self.df)
+        self.modelo = RegresionLinealModeloDiagrama(self.df)
 
     def _clasificar_tipo(self, descripcion):
         if not isinstance(descripcion, str):
@@ -35,7 +34,7 @@ class ViviendaController:
             return "Otro"
 
     def mostrar_tabla(self):
-        print(tabulate(self.df, headers='keys', tablefmt='psql'))
+        print(self.df.to_string())
 
     def resumen_estadistico(self):
         total = len(self.df)

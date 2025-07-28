@@ -7,7 +7,7 @@ app = Flask(__name__, template_folder='resources/templates', static_folder='reso
 app.register_blueprint(home_bp)
 
 if __name__ == '__main__':
-    from src.controllers.controller import ViviendaController
+    from controllers.controllerPredecir import ViviendaController
     print("\n--- RESUMEN ESTADÍSTICO ---")
     controlador = ViviendaController()
     controlador.resumen_estadistico()

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, Response, request
-from src.controllers.controller import ViviendaController
+from controllers.controllerPredecir import ViviendaController
 import io
 import matplotlib.pyplot as plt
 import base64

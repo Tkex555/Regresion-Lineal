@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from ..models.modelPredecir import RegresionLinealModelo
 from ..database.db_conexion import MongoConexion
 
-class ViviendaController:
+class ViviendaPredecirController:
     def __init__(self, nombre_coleccion="vivienda"):
         # Conexión a MongoDB y carga de datos
         conexion = MongoConexion()

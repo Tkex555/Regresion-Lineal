@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predecir valor de vivienda</title>
+</head>
+<body>
+    <h2>Predecir valor de una vivienda</h2>
+    <form method="post">
+        <label>Área (m2):</label><br>
+        <input type="number" name="area" step="0.1" required><br><br>
+
+        <label>Habitaciones:</label><br>
+        <input type="number" name="habitaciones" required><br><br>
+
+        <label>Antigüedad (años):</label><br>
+        <input type="number" name="antiguedad" required><br><br>
+
+        <button type="submit">Predecir</button>
+    </form>
+
+    {% if prediccion is not none %}
+        <h3>Precio estimado: ${{ "{:,.2f}".format(prediccion) }}</h3>
+    {% endif %}
+
+    <br><a href="/"><button>Volver al inicio</button></a>
+</body>
+</html>

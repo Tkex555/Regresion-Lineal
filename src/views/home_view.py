@@ -50,3 +50,18 @@ def diagrama():
     buf.seek(0)
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     return render_template('diagrama.html', image_base64=image_base64)
+
+@home_bp.route('/predecir', methods=['GET', 'POST'])
+def predecir():
+    prediccion = None
+    if request.method == 'POST':
+        area = float(request.form['area'])
+        habitaciones = int(request.form['habitaciones'])
+        antiguedad = int(request.form['antiguedad'])
+
+        controller = ViviendaController()
+        controller.modelo.entrenar()
+        prediccion = controller.modelo.predecir(area, habitaciones, antiguedad)
+
+    return render_template('predecir.html', prediccion=prediccion)
+

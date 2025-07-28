@@ -1,5 +1,6 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
 
 class RegresionLinealModelo:
     def __init__(self, df):
@@ -8,23 +9,24 @@ class RegresionLinealModelo:
         self.entrenado = False
 
     def entrenar(self):
-        X = self.df[['area']]
+        # Entrenamos con las tres variables: área, habitaciones y antigüedad
+        X = self.df[['area', 'habitaciones', 'antiguedad']]
         y = self.df['precio']
         self.modelo.fit(X, y)
         self.entrenado = True
-        intercepto = self.modelo.intercept_
-        pendiente = self.modelo.coef_[0]
-        return intercepto, pendiente
+        return self.modelo.intercept_, self.modelo.coef_
 
-    def predecir(self, area):
+    def predecir(self, area, habitaciones, antiguedad):
         if not self.entrenado:
             raise Exception("El modelo no ha sido entrenado.")
-        return self.modelo.predict([[area]])[0]
+        # Crear el vector de entrada con las tres variables
+        entrada = np.array([[area, habitaciones, antiguedad]])
+        return self.modelo.predict(entrada)[0]
 
     def obtener_metricas(self):
         if not self.entrenado:
             raise Exception("El modelo no ha sido entrenado.")
-        X = self.df[['area']]
+        X = self.df[['area', 'habitaciones', 'antiguedad']]
         y = self.df['precio']
         y_pred = self.modelo.predict(X)
         mse = mean_squared_error(y, y_pred)
